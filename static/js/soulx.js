@@ -588,10 +588,7 @@
 
   function startSessionAudio() {
     sessionStarted = true;
-    if (decodedAudioQueue.length > 0) {
-      var entry = decodedAudioQueue.shift();
-      scheduleChunk(entry.buffer, entry.text, ttsSessionId);
-    }
+    // 不在这里调度——等二进制帧到达后由 handleFlashheadFrames 统一调度
   }
 
   function scheduleChunk(audioBuffer, subtitleText, sessionId) {
