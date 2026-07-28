@@ -420,6 +420,8 @@
       // 首帧到达时，把缓存的所有音频一次性排入 nextPlayTime 链
       if (decodedAudioQueue.length > 0 && !sessionStarted) {
         flushAudioQueue();
+      } else if (!sessionStarted) {
+        console.log('[sync] first frames arrived but audioQueue EMPTY, waiting...');
       }
     });
   }
@@ -548,6 +550,7 @@
         audioCtx.decodeAudioData(arrayBuf, function (audioBuffer) {
           if (sessionId !== ttsSessionId) { resolve(); return; }
           decodedAudioQueue.push({ buffer: audioBuffer, text: subtitleText });
+          console.log('[sync] decoded audio, queue now ' + decodedAudioQueue.length + ' (sessionId=' + sessionId + ')');
           resolve();
           var float32Data = resampleToFloat32Sync(audioBuffer, 16000);
           if (!float32Data || float32Data.length === 0) return;
@@ -606,7 +609,7 @@
       scheduledDuration = 0;
     }
     scheduledDuration += audioBuffer.duration;
-    console.log('[sync] schedule dur=' + audioBuffer.duration.toFixed(2) + 's, start=' + startTime.toFixed(2) + ', schedDur=' + scheduledDuration.toFixed(2) + ', nextPlay=' + (startTime + audioBuffer.duration).toFixed(2));
+    console.log('[sync] schedule dur=' + audioBuffer.duration.toFixed(2) + 's start=' + startTime.toFixed(2) + ' ctxState=' + audioCtx.state + ' nextPlay=' + (startTime + audioBuffer.duration).toFixed(2) + ' schedDur=' + scheduledDuration.toFixed(2));
     try {
       var source = audioCtx.createBufferSource();
       source.buffer = audioBuffer;
@@ -617,7 +620,7 @@
       };
       activeSources.push(source);
       source.start(startTime);
-    } catch (e) {}
+    } catch (e) { console.error('[sync] schedule ERROR:', e); }
     nextPlayTime = startTime + audioBuffer.duration;
 
     if (subtitleText) {
