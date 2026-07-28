@@ -568,7 +568,9 @@
     } catch (e) {}
   }
 
-  // 串行链：解码 → 缓冲 + 流控转发 FlashHead；帧到位后由 handleFlashheadFrames 调度播放
+  // 串行链：解码 → 缓冲；发送 FlashHead 独立异步，不阻塞解码流水线
+  var sendChain = Promise.resolve();  // 发送专用串行链，保序但独立于 audioChain
+
   function enqueueAudio(audioBytes, subtitleText) {
     var sessionId = ttsSessionId;
     audioChain = audioChain.then(function () {
@@ -581,19 +583,24 @@
         audioCtx.decodeAudioData(arrayBuf, function (audioBuffer) {
           if (sessionId !== ttsSessionId) { resolve(); return; }
           decodedAudioQueue.push({ buffer: audioBuffer, text: subtitleText });
+          resolve();  // 解码完成立即释放链，不等待发送
           var float32Data = resampleToFloat32Sync(audioBuffer, 16000);
-          if (!float32Data || float32Data.length === 0) { resolve(); return; }
-          paceInFlight(sessionId, function () {
-            if (sessionId !== ttsSessionId) { resolve(); return; }
-            if (isReady && flashheadWs && flashheadWs.readyState === WebSocket.OPEN) {
-              flashheadWs.send(JSON.stringify({
-                type: 'audio_chunk',
-                audio: arrayBufferToBase64(float32Data.buffer),
-                audio_format: 'float32'
-              }));
-              samplesSent += float32Data.length;
-            }
-            resolve();
+          if (!float32Data || float32Data.length === 0) return;
+          sendChain = sendChain.then(function () {
+            return new Promise(function (sendResolve) {
+              paceInFlight(sessionId, function () {
+                if (sessionId !== ttsSessionId) { sendResolve(); return; }
+                if (isReady && flashheadWs && flashheadWs.readyState === WebSocket.OPEN) {
+                  flashheadWs.send(JSON.stringify({
+                    type: 'audio_chunk',
+                    audio: arrayBufferToBase64(float32Data.buffer),
+                    audio_format: 'float32'
+                  }));
+                  samplesSent += float32Data.length;
+                }
+                sendResolve();
+              });
+            });
           });
         }, function () { resolve(); });
       });
@@ -658,6 +665,7 @@
     scheduledDuration = 0;
     framesShown = 0;
     clearFrameQueue();
+    sendChain = Promise.resolve();
     for (var i = 0; i < activeSources.length; i++) {
       try { activeSources[i].stop(); } catch (e) {}
     }
