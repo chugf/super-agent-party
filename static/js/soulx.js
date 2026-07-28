@@ -418,8 +418,11 @@
         frameQueue.push(bm);
       }
       if (sessionStarted && decodedAudioQueue.length > 0) {
+        console.log('[sync] frames arrived, scheduling audio (frameQueue=' + frameQueue.length + ', audioQueue=' + decodedAudioQueue.length + ')');
         var entry = decodedAudioQueue.shift();
         scheduleChunk(entry.buffer, entry.text, ttsSessionId);
+      } else if (sessionStarted) {
+        console.log('[sync] frames arrived but audioQueue empty (frameQueue=' + frameQueue.length + ')');
       }
     });
   }
@@ -437,6 +440,10 @@
         if (elapsed < 0) elapsed = 0;
         if (elapsed > scheduledDuration) elapsed = scheduledDuration;
         var targetFrame = Math.floor(elapsed * 16000 / samplesPerFrame);
+        var gap = targetFrame - framesShown;
+        if (gap > 4 && framesShown % 25 === 0) {
+          console.log('[render] gap=' + gap + ' target=' + targetFrame + ' shown=' + framesShown + ' queue=' + frameQueue.length + ' elapsed=' + elapsed.toFixed(2) + ' schedDur=' + scheduledDuration.toFixed(2));
+        }
         while (framesShown < targetFrame && frameQueue.length > 0) {
           var f = frameQueue.shift();
           ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -582,7 +589,7 @@
 
   function startSessionAudio() {
     sessionStarted = true;
-    // 不在这里调度——等二进制帧到达后由 handleFlashheadFrames 统一调度
+    console.log('[sync] session started (decodedAudioQueue=' + decodedAudioQueue.length + ', frameQueue=' + frameQueue.length + ')');
   }
 
   function scheduleChunk(audioBuffer, subtitleText, sessionId) {
@@ -592,6 +599,7 @@
       scheduledDuration = 0;
     }
     scheduledDuration += audioBuffer.duration;
+    console.log('[sync] schedule chunk dur=' + audioBuffer.duration.toFixed(2) + 's, start=' + startTime.toFixed(2) + ', schedDur=' + scheduledDuration.toFixed(2) + ', nextPlay=' + (startTime + audioBuffer.duration).toFixed(2) + ', queueLeft=' + decodedAudioQueue.length);
     try {
       var source = audioCtx.createBufferSource();
       source.buffer = audioBuffer;
