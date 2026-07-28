@@ -23,7 +23,6 @@
   var soulxImages = [];
   var soulxImagesDir = '';
   var selectedImageId = '';
-  var directoryMode = false;
   var condImageSrc = '';
   var transparentBg = true;
   var frameFormat = 'image/jpeg';
@@ -91,10 +90,6 @@
       selectedImageId = selected.id;
     }
 
-    // 目录模式：仅用于用户本地上传的图片。默认内置图片走 base64 模式
-    var isDefaultImage = selected && selected.default === true;
-    directoryMode = !!(selected && !isDefaultImage && soulxImagesDir && isLocalServer(flashheadUrl));
-
     if (selected) {
       condImageSrc = selected.url;
     } else if (condImageB64) {
@@ -113,18 +108,7 @@
       connectFlashHead();
       connectTTS();
     };
-
-    if (directoryMode || condImageB64) {
-      begin();
-    } else {
-      // 远程服务：把选中的图片读成 base64 再 init
-      imageUrlToBase64(condImageSrc).then(function (b64) {
-        condImageB64 = b64;
-        begin();
-      }).catch(function (err) {
-        setError('读取参考图片失败: ' + err.message);
-      });
-    }
+    begin();
   }).catch(function (err) {
     setError('加载配置失败: ' + err.message);
   });
@@ -160,6 +144,12 @@
         reader.readAsDataURL(blob);
       });
     });
+  }
+
+  function resolveImageUrl(src) {
+    if (!src) return '';
+    if (/^https?:\/\//i.test(src) || /^data:/i.test(src)) return src;
+    return location.protocol + '//' + location.host + src;
   }
 
   function drawCondImage() {
@@ -210,15 +200,9 @@
         type: 'init',
         base_seed: 42,
         use_face_crop: false,
-        transparent_bg: transparentBg
+        transparent_bg: transparentBg,
+        cond_url: resolveImageUrl(condImageSrc)
       };
-      if (directoryMode) {
-        initMsg.cond_image = soulxImagesDir;
-        initMsg.cond_is_path = true;
-      } else {
-        initMsg.cond_image = condImageB64;
-        initMsg.cond_is_path = false;
-      }
       flashheadWs.send(JSON.stringify(initMsg));
       setStatus('正在初始化模型...');
     };
@@ -246,10 +230,6 @@
             condImageDrawn = false;
             drawCondImage();
             hideOverlay();
-            // 目录模式：init 默认选中排序后的第一张图，需 reset 切换到用户选择的形象
-            if (directoryMode && selectedImageId) {
-              flashheadWs.send(JSON.stringify({ type: 'reset', person_name: selectedImageId }));
-            }
             break;
           case 'frames_meta':
             if (msg.width && msg.height && (msg.width * srScale() !== canvas.width || msg.height * srScale() !== canvas.height)) {
