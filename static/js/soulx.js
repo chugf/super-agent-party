@@ -44,7 +44,6 @@
   var samplesSent = 0;
   var samplesProcessed = 0;
   var sessionStarted = false;
-  var decodedAudioQueue = [];   // { buffer, text } — 帧到位后才取出调度
   var frameGeneration = 0;
   var framesShown = 0;
   var framesShownTotal = 0;
@@ -417,13 +416,6 @@
         }
         frameQueue.push(bm);
       }
-      if (sessionStarted && decodedAudioQueue.length > 0) {
-        console.log('[sync] frames arrived, scheduling ALL audio (frameQueue=' + frameQueue.length + ', audioQueue=' + decodedAudioQueue.length + ')');
-        while (decodedAudioQueue.length > 0) {
-          var entry = decodedAudioQueue.shift();
-          scheduleChunk(entry.buffer, entry.text, ttsSessionId);
-        }
-      }
     });
   }
 
@@ -544,7 +536,7 @@
         var arrayBuf = audioBytes.buffer.slice(audioBytes.byteOffset, audioBytes.byteOffset + audioBytes.byteLength);
         audioCtx.decodeAudioData(arrayBuf, function (audioBuffer) {
           if (sessionId !== ttsSessionId) { resolve(); return; }
-          decodedAudioQueue.push({ buffer: audioBuffer, text: subtitleText });
+          scheduleChunk(audioBuffer, subtitleText, sessionId);
           resolve();
           var float32Data = resampleToFloat32Sync(audioBuffer, 16000);
           if (!float32Data || float32Data.length === 0) return;
@@ -585,7 +577,7 @@
 
   function startSessionAudio() {
     sessionStarted = true;
-    console.log('[sync] session started (decodedAudioQueue=' + decodedAudioQueue.length + ', frameQueue=' + frameQueue.length + ')');
+    console.log('[sync] session started (frameQueue=' + frameQueue.length + ')');
   }
 
   function scheduleChunk(audioBuffer, subtitleText, sessionId) {
@@ -595,7 +587,7 @@
       scheduledDuration = 0;
     }
     scheduledDuration += audioBuffer.duration;
-    console.log('[sync] schedule chunk dur=' + audioBuffer.duration.toFixed(2) + 's, start=' + startTime.toFixed(2) + ', schedDur=' + scheduledDuration.toFixed(2) + ', nextPlay=' + (startTime + audioBuffer.duration).toFixed(2) + ', queueLeft=' + decodedAudioQueue.length);
+    console.log('[sync] schedule dur=' + audioBuffer.duration.toFixed(2) + 's, start=' + startTime.toFixed(2) + ', schedDur=' + scheduledDuration.toFixed(2) + ', nextPlay=' + (startTime + audioBuffer.duration).toFixed(2));
     try {
       var source = audioCtx.createBufferSource();
       source.buffer = audioBuffer;
@@ -620,7 +612,6 @@
   function stopAllAudio() {
     ttsSessionId++;
     nextPlayTime = 0;
-    decodedAudioQueue = [];
     audioClockStart = 0;
     scheduledDuration = 0;
     framesShown = 0;
@@ -664,7 +655,6 @@
         sessionChunkStamp++;
         frameGeneration++;
         nextPlayTime = 0;
-        decodedAudioQueue = [];
         audioClockStart = 0;
         scheduledDuration = 0;
         framesShown = 0;
