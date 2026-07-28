@@ -44,6 +44,7 @@
   var samplesSent = 0;
   var samplesProcessed = 0;
   var sessionStarted = false;
+  var decodedAudioQueue = [];
   var frameGeneration = 0;
   var framesShown = 0;
   var framesShownTotal = 0;
@@ -416,6 +417,10 @@
         }
         frameQueue.push(bm);
       }
+      // 首帧到达时，把缓存的所有音频一次性排入 nextPlayTime 链
+      if (!sessionStarted && decodedAudioQueue.length > 0) {
+        flushAudioQueue();
+      }
     });
   }
 
@@ -536,7 +541,7 @@
         var arrayBuf = audioBytes.buffer.slice(audioBytes.byteOffset, audioBytes.byteOffset + audioBytes.byteLength);
         audioCtx.decodeAudioData(arrayBuf, function (audioBuffer) {
           if (sessionId !== ttsSessionId) { resolve(); return; }
-          scheduleChunk(audioBuffer, subtitleText, sessionId);
+          decodedAudioQueue.push({ buffer: audioBuffer, text: subtitleText });
           resolve();
           var float32Data = resampleToFloat32Sync(audioBuffer, 16000);
           if (!float32Data || float32Data.length === 0) return;
@@ -577,7 +582,17 @@
 
   function startSessionAudio() {
     sessionStarted = true;
-    console.log('[sync] session started (frameQueue=' + frameQueue.length + ')');
+    console.log('[sync] session started (frameQueue=' + frameQueue.length + ', audioQueue=' + decodedAudioQueue.length + ')');
+  }
+
+  function flushAudioQueue() {
+    // 首帧就绪后一次性排出所有缓存的音频，nextPlayTime 保证零间隙
+    console.log('[sync] flushAudioQueue: scheduling ' + decodedAudioQueue.length + ' chunks');
+    sessionStarted = true;
+    while (decodedAudioQueue.length > 0) {
+      var entry = decodedAudioQueue.shift();
+      scheduleChunk(entry.buffer, entry.text, ttsSessionId);
+    }
   }
 
   function scheduleChunk(audioBuffer, subtitleText, sessionId) {
@@ -612,6 +627,7 @@
   function stopAllAudio() {
     ttsSessionId++;
     nextPlayTime = 0;
+    decodedAudioQueue = [];
     audioClockStart = 0;
     scheduledDuration = 0;
     framesShown = 0;
@@ -655,6 +671,7 @@
         sessionChunkStamp++;
         frameGeneration++;
         nextPlayTime = 0;
+        decodedAudioQueue = [];
         audioClockStart = 0;
         scheduledDuration = 0;
         framesShown = 0;
