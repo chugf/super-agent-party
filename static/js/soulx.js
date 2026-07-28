@@ -22,6 +22,7 @@
   var condImageB64 = '';
   var soulxImages = [];
   var soulxImagesDir = '';
+  var soulxConfig = {};
   var selectedImageId = '';
   var condImageSrc = '';
   var transparentBg = true;
@@ -74,6 +75,7 @@
     var data = results[0];
     var imgData = results[1] || {};
     var cfg = data.SoulxConfig || data || {};
+    soulxConfig = cfg;
     flashheadUrl = cfg.serverUrl || flashheadUrl;
     condImageB64 = cfg.condImage || '';
     transparentBg = cfg.transparentBg !== false;
@@ -129,27 +131,9 @@
       .catch(function () { return { success: false, images: [], dir: '' }; });
   }
 
-  function isLocalServer(url) {
-    return /^wss?:\/\/(127\.0\.0\.1|localhost|\[::1\])/i.test(url);
-  }
-
-  function imageUrlToBase64(url) {
-    return fetch(url).then(function (r) { return r.blob(); }).then(function (blob) {
-      return new Promise(function (resolve, reject) {
-        var reader = new FileReader();
-        reader.onload = function () {
-          resolve(String(reader.result).split(',')[1] || '');
-        };
-        reader.onerror = function () { reject(new Error('FileReader error')); };
-        reader.readAsDataURL(blob);
-      });
-    });
-  }
-
-  function resolveImageUrl(src) {
-    if (!src) return '';
-    if (/^https?:\/\//i.test(src) || /^data:/i.test(src)) return src;
-    return location.protocol + '//' + location.host + src;
+  function initBaseUrl() {
+    if (soulxConfig && soulxConfig.imageBaseUrl) return soulxConfig.imageBaseUrl;
+    return location.origin;
   }
 
   function drawCondImage() {
@@ -201,7 +185,7 @@
         base_seed: 42,
         use_face_crop: false,
         transparent_bg: transparentBg,
-        cond_url: resolveImageUrl(condImageSrc)
+        cond_url: initBaseUrl() + condImageSrc
       };
       flashheadWs.send(JSON.stringify(initMsg));
       setStatus('正在初始化模型...');
