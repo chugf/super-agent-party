@@ -614,12 +614,25 @@
   }
 
   function flushAudioQueue() {
-    console.log('[sync] flushAudioQueue: scheduling ' + decodedAudioQueue.length + ' chunks');
-    sessionStarted = true;
+    var entries = [];
     while (decodedAudioQueue.length > 0) {
-      var entry = decodedAudioQueue.shift();
-      scheduleChunk(entry.buffer, entry.text, ttsSessionId);
+      entries.push(decodedAudioQueue.shift());
     }
+    if (entries.length === 0) return;
+    console.log('[sync] flushAudioQueue: merging ' + entries.length + ' chunks into one buffer');
+    // 合并所有音频缓冲为一段连续音频，保证与 FlashHead 子块帧率对齐
+    var totalLen = 0;
+    for (var i = 0; i < entries.length; i++) totalLen += entries[i].buffer.length;
+    var merged = audioCtx.createBuffer(1, totalLen, entries[0].buffer.sampleRate);
+    var ch = merged.getChannelData(0);
+    var off = 0;
+    for (var i = 0; i < entries.length; i++) {
+      ch.set(entries[i].buffer.getChannelData(0), off);
+      off += entries[i].buffer.length;
+    }
+    var mergedText = entries.map(function(e) { return e.text; }).filter(Boolean).join('');
+    sessionStarted = true;
+    scheduleChunk(merged, mergedText, ttsSessionId);
   }
 
   function scheduleChunk(audioBuffer, subtitleText, sessionId) {
