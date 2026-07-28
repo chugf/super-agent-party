@@ -418,11 +418,11 @@
         frameQueue.push(bm);
       }
       if (sessionStarted && decodedAudioQueue.length > 0) {
-        console.log('[sync] frames arrived, scheduling audio (frameQueue=' + frameQueue.length + ', audioQueue=' + decodedAudioQueue.length + ')');
-        var entry = decodedAudioQueue.shift();
-        scheduleChunk(entry.buffer, entry.text, ttsSessionId);
-      } else if (sessionStarted) {
-        console.log('[sync] frames arrived but audioQueue empty (frameQueue=' + frameQueue.length + ')');
+        console.log('[sync] frames arrived, scheduling ALL audio (frameQueue=' + frameQueue.length + ', audioQueue=' + decodedAudioQueue.length + ')');
+        while (decodedAudioQueue.length > 0) {
+          var entry = decodedAudioQueue.shift();
+          scheduleChunk(entry.buffer, entry.text, ttsSessionId);
+        }
       }
     });
   }
@@ -440,10 +440,6 @@
         if (elapsed < 0) elapsed = 0;
         if (elapsed > scheduledDuration) elapsed = scheduledDuration;
         var targetFrame = Math.floor(elapsed * 16000 / samplesPerFrame);
-        var gap = targetFrame - framesShown;
-        if (gap > 4 && framesShown % 25 === 0) {
-          console.log('[render] gap=' + gap + ' target=' + targetFrame + ' shown=' + framesShown + ' queue=' + frameQueue.length + ' elapsed=' + elapsed.toFixed(2) + ' schedDur=' + scheduledDuration.toFixed(2));
-        }
         while (framesShown < targetFrame && frameQueue.length > 0) {
           var f = frameQueue.shift();
           ctx.clearRect(0, 0, canvas.width, canvas.height);
