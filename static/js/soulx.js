@@ -418,7 +418,7 @@
         frameQueue.push(bm);
       }
       // 首帧到达时，把缓存的所有音频一次性排入 nextPlayTime 链
-      if (!sessionStarted && decodedAudioQueue.length > 0) {
+      if (decodedAudioQueue.length > 0 && !sessionStarted) {
         flushAudioQueue();
       }
     });
@@ -581,12 +581,10 @@
   }
 
   function startSessionAudio() {
-    sessionStarted = true;
-    console.log('[sync] session started (frameQueue=' + frameQueue.length + ', audioQueue=' + decodedAudioQueue.length + ')');
+    console.log('[sync] frames_meta arrived (audioQueue=' + decodedAudioQueue.length + ')');
   }
 
   function flushAudioQueue() {
-    // 首帧就绪后一次性排出所有缓存的音频，nextPlayTime 保证零间隙
     console.log('[sync] flushAudioQueue: scheduling ' + decodedAudioQueue.length + ' chunks');
     sessionStarted = true;
     while (decodedAudioQueue.length > 0) {
