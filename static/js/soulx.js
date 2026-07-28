@@ -417,11 +417,16 @@
         }
         frameQueue.push(bm);
       }
-      // 首帧到达时，把缓存的所有音频一次性排入 nextPlayTime 链
-      if (decodedAudioQueue.length > 0 && !sessionStarted) {
-        flushAudioQueue();
-      } else if (!sessionStarted) {
-        console.log('[sync] first frames arrived but audioQueue EMPTY, waiting...');
+      // 帧到达时排出队列中所有已解码的音频，首次整批排，后续增量排
+      if (decodedAudioQueue.length > 0) {
+        if (!sessionStarted) {
+          flushAudioQueue();
+        } else {
+          while (decodedAudioQueue.length > 0) {
+            var entry = decodedAudioQueue.shift();
+            scheduleChunk(entry.buffer, entry.text, ttsSessionId);
+          }
+        }
       }
     });
   }
