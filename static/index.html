@@ -16623,7 +16623,7 @@ function updateElement(el, rawMarkdown, formatFn) {
                           <el-alert type="info" :closable="false" class="mb-2">
                             <template #default>
                               <div class="alert-content">
-                                {{t('thaNotice1')}}
+                                <span v-html="t('thaNotice1')"></span>
                               </div>
                             </template>
                           </el-alert>
