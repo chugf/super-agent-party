@@ -45,11 +45,12 @@
   var samplesSent = 0;
   var samplesProcessed = 0;
   var sessionStarted = false;
-  var frameGeneration = 0;      // 防上句残留帧
+  var decodedAudioQueue = [];   // { buffer, text } — 帧到位后才取出调度
+  var frameGeneration = 0;
   var framesShown = 0;
   var framesShownTotal = 0;
   var audioChain = Promise.resolve();
-  var sendChain = Promise.resolve();  // 发送专用链
+  var sendChain = Promise.resolve();  // 发送独立链，不阻塞解码
   var nextPlayTime = 0;
   var audioClockStart = 0;
   var scheduledDuration = 0;
@@ -448,6 +449,10 @@
         }
         frameQueue.push(bm);
       }
+      if (sessionStarted && decodedAudioQueue.length > 0) {
+        var entry = decodedAudioQueue.shift();
+        scheduleChunk(entry.buffer, entry.text, ttsSessionId);
+      }
     });
   }
 
@@ -562,7 +567,7 @@
     } catch (e) {}
   }
 
-  // 串行链：解码 → 立即调度播放 + 异步转发 FlashHead
+  // 串行链：解码 → 缓冲；发送异步，不阻塞解码。帧到位后才调度播放。
   function enqueueAudio(audioBytes, subtitleText) {
     var sessionId = ttsSessionId;
     audioChain = audioChain.then(function () {
@@ -574,7 +579,7 @@
         var arrayBuf = audioBytes.buffer.slice(audioBytes.byteOffset, audioBytes.byteOffset + audioBytes.byteLength);
         audioCtx.decodeAudioData(arrayBuf, function (audioBuffer) {
           if (sessionId !== ttsSessionId) { resolve(); return; }
-          scheduleChunk(audioBuffer, subtitleText, sessionId);
+          decodedAudioQueue.push({ buffer: audioBuffer, text: subtitleText });
           resolve();
           var float32Data = resampleToFloat32Sync(audioBuffer, 16000);
           if (!float32Data || float32Data.length === 0) return;
@@ -613,9 +618,12 @@
     }
   }
 
-  // 首帧元数据到达：标记会话已启动
   function startSessionAudio() {
     sessionStarted = true;
+    if (decodedAudioQueue.length > 0) {
+      var entry = decodedAudioQueue.shift();
+      scheduleChunk(entry.buffer, entry.text, ttsSessionId);
+    }
   }
 
   function scheduleChunk(audioBuffer, subtitleText, sessionId) {
@@ -649,6 +657,7 @@
   function stopAllAudio() {
     ttsSessionId++;
     nextPlayTime = 0;
+    decodedAudioQueue = [];
     audioClockStart = 0;
     scheduledDuration = 0;
     framesShown = 0;
@@ -692,6 +701,7 @@
         sessionChunkStamp++;
         frameGeneration++;
         nextPlayTime = 0;
+        decodedAudioQueue = [];
         audioClockStart = 0;
         scheduledDuration = 0;
         framesShown = 0;
