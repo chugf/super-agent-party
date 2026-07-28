@@ -11636,6 +11636,7 @@ async def get_soulx_images(request: Request):
                         "id": stem,
                         "name": stem,
                         "url": f"/default_soulx_images/{fname}",
+                        "path": os.path.abspath(os.path.join(default_dir, fname)),
                         "default": True
                     })
         # 用户上传的形象
@@ -11647,7 +11648,8 @@ async def get_soulx_images(request: Request):
                     images.append({
                         "id": stem,
                         "name": stem,
-                        "url": f"/uploaded_files/soulx_images/{fname}"
+                        "url": f"/uploaded_files/soulx_images/{fname}",
+                        "path": os.path.abspath(os.path.join(SOULX_IMAGES_DIR, fname))
                     })
         return JSONResponse(content={
             "success": True,

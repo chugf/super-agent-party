@@ -22,9 +22,9 @@
   var condImageB64 = '';
   var soulxImages = [];
   var soulxImagesDir = '';
-  var soulxConfig = {};
   var selectedImageId = '';
   var condImageSrc = '';
+  var condImagePath = '';
   var transparentBg = true;
   var frameFormat = 'image/jpeg';
 
@@ -75,7 +75,6 @@
     var data = results[0];
     var imgData = results[1] || {};
     var cfg = data.SoulxConfig || data || {};
-    soulxConfig = cfg;
     flashheadUrl = cfg.serverUrl || flashheadUrl;
     condImageB64 = cfg.condImage || '';
     transparentBg = cfg.transparentBg !== false;
@@ -94,6 +93,7 @@
 
     if (selected) {
       condImageSrc = selected.url;
+      condImagePath = selected.path || '';
     } else if (condImageB64) {
       condImageSrc = 'data:image/png;base64,' + condImageB64;
     }
@@ -132,7 +132,6 @@
   }
 
   function initBaseUrl() {
-    if (soulxConfig && soulxConfig.imageBaseUrl) return soulxConfig.imageBaseUrl;
     return location.origin;
   }
 
@@ -180,13 +179,19 @@
     flashheadWs.binaryType = 'arraybuffer';
 
     flashheadWs.onopen = function () {
+      var isLocal = /^wss?:\/\/(127\.0\.0\.1|localhost|\[::1\])/i.test(flashheadUrl);
       var initMsg = {
         type: 'init',
         base_seed: 42,
         use_face_crop: false,
-        transparent_bg: transparentBg,
-        cond_url: initBaseUrl() + condImageSrc
+        transparent_bg: transparentBg
       };
+      if (isLocal && condImagePath) {
+        initMsg.cond_image = condImagePath;
+        initMsg.cond_is_path = true;
+      } else {
+        initMsg.cond_url = initBaseUrl() + condImageSrc;
+      }
       flashheadWs.send(JSON.stringify(initMsg));
       setStatus('正在初始化模型...');
     };
@@ -214,6 +219,7 @@
             condImageDrawn = false;
             drawCondImage();
             hideOverlay();
+            // 本地路径模式：直接传文件路径，WSL2 后端自动转换为 /mnt/... 路径
             break;
           case 'frames_meta':
             if (msg.width && msg.height && (msg.width * srScale() !== canvas.width || msg.height * srScale() !== canvas.height)) {
