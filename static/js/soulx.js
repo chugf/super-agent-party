@@ -555,7 +555,6 @@
         audioCtx.decodeAudioData(arrayBuf, function (audioBuffer) {
           if (sessionId !== ttsSessionId) { resolve(); return; }
           decodedAudioQueue.push({ buffer: audioBuffer, text: subtitleText });
-          console.log('[sync] decoded audio, queue now ' + decodedAudioQueue.length + ' (sessionId=' + sessionId + ')');
           resolve();
           var float32Data = resampleToFloat32Sync(audioBuffer, 16000);
           if (!float32Data || float32Data.length === 0) return;
@@ -595,11 +594,9 @@
   }
 
   function startSessionAudio() {
-    console.log('[sync] frames_meta arrived (audioQueue=' + decodedAudioQueue.length + ')');
   }
 
   function flushAudioQueue() {
-    console.log('[sync] flushAudioQueue: scheduling ' + decodedAudioQueue.length + ' chunks');
     sessionStarted = true;
     while (decodedAudioQueue.length > 0) {
       var entry = decodedAudioQueue.shift();
@@ -614,7 +611,6 @@
       scheduledDuration = 0;
     }
     scheduledDuration += audioBuffer.duration;
-    console.log('[sync] schedule dur=' + audioBuffer.duration.toFixed(2) + 's start=' + startTime.toFixed(2) + ' ctxState=' + audioCtx.state + ' nextPlay=' + (startTime + audioBuffer.duration).toFixed(2) + ' schedDur=' + scheduledDuration.toFixed(2));
     try {
       var source = audioCtx.createBufferSource();
       source.buffer = audioBuffer;
@@ -625,7 +621,7 @@
       };
       activeSources.push(source);
       source.start(startTime);
-    } catch (e) { console.error('[sync] schedule ERROR:', e); }
+    } catch (e) {}
     nextPlayTime = startTime + audioBuffer.duration;
 
     if (subtitleText) {
