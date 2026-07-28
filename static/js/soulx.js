@@ -40,17 +40,16 @@
   var renderLoopStarted = false;
 
   // ---- 音画同步状态 ----
-  // 帧门控 + 音频驱动：音频解码后先缓冲，等帧到位才调度播放；
-  // 渲染循环以音频时钟为基准展示帧，确保口型与声音对齐。
+  // 音频立即调度播放，帧异步到达入队。渲染循环以音频时钟为基准展示帧。
   var chunkAudioSamples = 15360;
   var samplesSent = 0;
   var samplesProcessed = 0;
   var sessionStarted = false;
-  var decodedAudioQueue = [];   // { buffer: AudioBuffer, text: string } FIFO
   var frameGeneration = 0;      // 防上句残留帧
   var framesShown = 0;
   var framesShownTotal = 0;
   var audioChain = Promise.resolve();
+  var sendChain = Promise.resolve();  // 发送专用链
   var nextPlayTime = 0;
   var audioClockStart = 0;
   var scheduledDuration = 0;
@@ -449,11 +448,6 @@
         }
         frameQueue.push(bm);
       }
-      // 帧到位后调度缓冲的音频（每次只调度一段，由帧抵达节奏自然限速）
-      if (sessionStarted && decodedAudioQueue.length > 0) {
-        var entry = decodedAudioQueue.shift();
-        scheduleChunk(entry.buffer, entry.text, ttsSessionId);
-      }
     });
   }
 
@@ -468,7 +462,7 @@
       if (audioClockStart > 0 && scheduledDuration > 0) {
         var elapsed = audioCtx.currentTime - audioClockStart;
         if (elapsed < 0) elapsed = 0;
-        var audioDone = elapsed >= scheduledDuration && frameQueue.length === 0 && decodedAudioQueue.length === 0;
+        var audioDone = elapsed >= scheduledDuration && frameQueue.length === 0;
         if (audioDone) {
           audioClockStart = 0;
           scheduledDuration = 0;
@@ -568,9 +562,7 @@
     } catch (e) {}
   }
 
-  // 串行链：解码 → 缓冲；发送 FlashHead 独立异步，不阻塞解码流水线
-  var sendChain = Promise.resolve();  // 发送专用串行链，保序但独立于 audioChain
-
+  // 串行链：解码 → 立即调度播放 + 异步转发 FlashHead
   function enqueueAudio(audioBytes, subtitleText) {
     var sessionId = ttsSessionId;
     audioChain = audioChain.then(function () {
@@ -582,8 +574,8 @@
         var arrayBuf = audioBytes.buffer.slice(audioBytes.byteOffset, audioBytes.byteOffset + audioBytes.byteLength);
         audioCtx.decodeAudioData(arrayBuf, function (audioBuffer) {
           if (sessionId !== ttsSessionId) { resolve(); return; }
-          decodedAudioQueue.push({ buffer: audioBuffer, text: subtitleText });
-          resolve();  // 解码完成立即释放链，不等待发送
+          scheduleChunk(audioBuffer, subtitleText, sessionId);
+          resolve();
           var float32Data = resampleToFloat32Sync(audioBuffer, 16000);
           if (!float32Data || float32Data.length === 0) return;
           sendChain = sendChain.then(function () {
@@ -621,12 +613,9 @@
     }
   }
 
-  // 首帧元数据到达：标记会话启动，音频由后续 handleFlashheadFrames 调度
+  // 首帧元数据到达：标记会话已启动
   function startSessionAudio() {
     sessionStarted = true;
-    if (nextPlayTime < audioCtx.currentTime + 0.05) {
-      nextPlayTime = audioCtx.currentTime + 0.05;
-    }
   }
 
   function scheduleChunk(audioBuffer, subtitleText, sessionId) {
@@ -660,7 +649,6 @@
   function stopAllAudio() {
     ttsSessionId++;
     nextPlayTime = 0;
-    decodedAudioQueue = [];
     audioClockStart = 0;
     scheduledDuration = 0;
     framesShown = 0;
@@ -704,7 +692,6 @@
         sessionChunkStamp++;
         frameGeneration++;
         nextPlayTime = 0;
-        decodedAudioQueue = [];
         audioClockStart = 0;
         scheduledDuration = 0;
         framesShown = 0;
