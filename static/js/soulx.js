@@ -559,37 +559,22 @@
           resolve();
           var float32Data = resampleToFloat32Sync(audioBuffer, 16000);
           if (!float32Data || float32Data.length === 0) return;
-          // 切分为 chunkAudioSamples 固定长度子块，保证每块产 24 帧
-          var offset = 0;
-          while (offset < float32Data.length) {
-            var end = Math.min(offset + chunkAudioSamples, float32Data.length);
-            var sub = float32Data.subarray(offset, end);
-            if (sub.length < chunkAudioSamples) {
-              // 最后一块不足，补零
-              var padded = new Float32Array(chunkAudioSamples);
-              padded.set(sub);
-              sub = padded;
-            }
-            (function (subChunk) {
-              sendChain = sendChain.then(function () {
-                return new Promise(function (sendResolve) {
-                  paceInFlight(sessionId, function () {
-                    if (sessionId !== ttsSessionId) { sendResolve(); return; }
-                    if (isReady && flashheadWs && flashheadWs.readyState === WebSocket.OPEN) {
-                      flashheadWs.send(JSON.stringify({
-                        type: 'audio_chunk',
-                        audio: arrayBufferToBase64(subChunk.buffer),
-                        audio_format: 'float32'
-                      }));
-                      samplesSent += subChunk.length;
-                    }
-                    sendResolve();
-                  });
-                });
+          sendChain = sendChain.then(function () {
+            return new Promise(function (sendResolve) {
+              paceInFlight(sessionId, function () {
+                if (sessionId !== ttsSessionId) { sendResolve(); return; }
+                if (isReady && flashheadWs && flashheadWs.readyState === WebSocket.OPEN) {
+                  flashheadWs.send(JSON.stringify({
+                    type: 'audio_chunk',
+                    audio: arrayBufferToBase64(float32Data.buffer),
+                    audio_format: 'float32'
+                  }));
+                  samplesSent += float32Data.length;
+                }
+                sendResolve();
               });
-            })(sub);
-            offset = end;
-          }
+            });
+          });
         }, function () { resolve(); });
       });
     });
