@@ -435,15 +435,21 @@
       if (audioClockStart > 0 && scheduledDuration > 0) {
         var elapsed = audioCtx.currentTime - audioClockStart;
         if (elapsed < 0) elapsed = 0;
-        if (elapsed > scheduledDuration) elapsed = scheduledDuration;
-        var targetFrame = Math.floor(elapsed * 16000 / samplesPerFrame);
-        while (framesShown < targetFrame && frameQueue.length > 0) {
-          var f = frameQueue.shift();
-          ctx.clearRect(0, 0, canvas.width, canvas.height);
-          ctx.drawImage(f, 0, 0, canvas.width, canvas.height);
-          f.close();
-          framesShown++;
-          framesShownTotal++;
+        if (elapsed > scheduledDuration) {
+          // 音频播完，切回回退模式，保留 frameQueue 用于显示尾部帧
+          audioClockStart = 0;
+          scheduledDuration = 0;
+          lastFrameTime = performance.now();
+        } else {
+          var targetFrame = Math.floor(elapsed * 16000 / samplesPerFrame);
+          while (framesShown < targetFrame && frameQueue.length > 0) {
+            var f = frameQueue.shift();
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.drawImage(f, 0, 0, canvas.width, canvas.height);
+            f.close();
+            framesShown++;
+            framesShownTotal++;
+          }
         }
       } else {
         // 无音频时的回退：按目标帧率消费帧
