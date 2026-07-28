@@ -776,15 +776,42 @@
   var textField = document.getElementById('text-input-field');
   var sendBtn = document.getElementById('text-send-btn');
 
-  // ==================== 控制面板（常显，无自动隐藏） ====================
+  // ==================== 控制面板（鼠标移动显示，静止后自动隐藏，与 THA 一致） ====================
+  var isPanelHovered = false;
+  var hideTimeout = null;
 
-  // 锁定穿透状态下，鼠标悬停面板时临时恢复鼠标事件（与 THA 一致）
+  function showPanel() {
+    clearTimeout(hideTimeout);
+    controlPanel.classList.remove('hidden');
+    controlPanel.style.opacity = '1';
+    controlPanel.style.transform = 'translateX(0)';
+  }
+  function hidePanel() {
+    if (!isPanelHovered) {
+      controlPanel.classList.add('hidden');
+      controlPanel.style.opacity = '0';
+      controlPanel.style.transform = 'translateX(20px)';
+    }
+  }
+  function scheduleHide() {
+    clearTimeout(hideTimeout);
+    hideTimeout = setTimeout(hidePanel, isLocked ? 200 : 1200);
+  }
+  document.body.addEventListener('mouseenter', function () { showPanel(); });
+  document.body.addEventListener('mousemove', function () { showPanel(); scheduleHide(); });
+  document.body.addEventListener('mouseleave', function () { if (!isPanelHovered) scheduleHide(); });
+  document.body.addEventListener('touchstart', function (e) {
+    if (!controlPanel.contains(e.target)) { showPanel(); scheduleHide(); }
+  }, { passive: true });
   controlPanel.addEventListener('mouseenter', function () {
+    isPanelHovered = true; clearTimeout(hideTimeout); showPanel();
     if (isLocked && window.electronAPI) window.electronAPI.setIgnoreMouseEvents(false);
   });
   controlPanel.addEventListener('mouseleave', function () {
+    isPanelHovered = false; scheduleHide();
     if (isLocked && window.electronAPI) window.electronAPI.setIgnoreMouseEvents(true, { forward: true });
   });
+  scheduleHide();
 
   function bindTapEvent(element, callback) {
     if (!element) return;
