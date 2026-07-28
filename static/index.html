@@ -3224,7 +3224,7 @@ function updateElement(el, rawMarkdown, formatFn) {
           :title="t('renameConversation')"
           width="420px"
         >
-          <el-form label-position="top">
+          <el-form label-position="top" @submit.native.prevent>
             <el-form-item :label="t('renameConversation')">
               <el-input
                 v-model="conversationRenameForm.name"
