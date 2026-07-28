@@ -24,7 +24,6 @@
   var soulxImagesDir = '';
   var selectedImageId = '';
   var condImageSrc = '';
-  var condImagePath = '';
   var transparentBg = true;
   var frameFormat = 'image/jpeg';
 
@@ -93,7 +92,6 @@
 
     if (selected) {
       condImageSrc = selected.url;
-      condImagePath = selected.path || '';
     } else if (condImageB64) {
       condImageSrc = 'data:image/png;base64,' + condImageB64;
     }
@@ -102,15 +100,25 @@
       return;
     }
 
-    startRenderLoop();
-    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-
-    var begin = function () {
-      if (!transparentBg) drawCondImage();
-      connectFlashHead();
-      connectTTS();
-    };
-    begin();
+    // 一律转 base64 发送，跨平台无需担心路径或网络权限
+    var resolvedUrl = condImageSrc;
+    if (!/^https?:\/\//i.test(resolvedUrl) && !/^data:/i.test(resolvedUrl)) {
+      resolvedUrl = location.origin + resolvedUrl;
+    }
+    fetch(resolvedUrl).then(function (r) { return r.blob(); }).then(function (blob) {
+      var reader = new FileReader();
+      reader.onload = function () {
+        condImageB64 = String(reader.result).split(',')[1] || '';
+        startRenderLoop();
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        if (!transparentBg) drawCondImage();
+        connectFlashHead();
+        connectTTS();
+      };
+      reader.readAsDataURL(blob);
+    }).catch(function (err) {
+      setError('读取参考图片失败: ' + err.message);
+    });
   }).catch(function (err) {
     setError('加载配置失败: ' + err.message);
   });
@@ -129,10 +137,6 @@
     return fetch(location.protocol + '//' + location.host + '/get_soulx_images')
       .then(function (r) { return r.json(); })
       .catch(function () { return { success: false, images: [], dir: '' }; });
-  }
-
-  function initBaseUrl() {
-    return location.origin;
   }
 
   function drawCondImage() {
@@ -179,19 +183,13 @@
     flashheadWs.binaryType = 'arraybuffer';
 
     flashheadWs.onopen = function () {
-      var isLocal = /^wss?:\/\/(127\.0\.0\.1|localhost|\[::1\])/i.test(flashheadUrl);
       var initMsg = {
         type: 'init',
+        cond_image: condImageB64,
         base_seed: 42,
         use_face_crop: false,
         transparent_bg: transparentBg
       };
-      if (isLocal && condImagePath) {
-        initMsg.cond_image = condImagePath;
-        initMsg.cond_is_path = true;
-      } else {
-        initMsg.cond_url = initBaseUrl() + condImageSrc;
-      }
       flashheadWs.send(JSON.stringify(initMsg));
       setStatus('正在初始化模型...');
     };
