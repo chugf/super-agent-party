@@ -590,6 +590,7 @@
             })(sub);
             offset = end;
           }
+        }, function () { resolve(); });
       });
     });
   }
