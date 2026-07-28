@@ -11868,6 +11868,11 @@ processMarkdownStreamForTTS(message, deltaText, isFinal = false) {
 
   async deleteSoulxImage(imageId) {
     try {
+      const img = this.SoulxConfig.images.find(i => i.id === imageId);
+      if (img && img.default) {
+        showNotification('默认形象不可删除', 'warning');
+        return;
+      }
       const response = await fetch(`/delete_soulx_image/${imageId}`, { method: 'DELETE' });
       const result = await response.json();
       if (result.success) {

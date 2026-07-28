@@ -471,7 +471,7 @@ import argparse
 from py.dify_openai import DifyOpenAIAsync
 from py.ClaudeAsOpenAI import AsyncClaudeAsOpenAI
 from py.GeminiAsOpenAI import AsyncGeminiAsOpenAI
-from py.get_setting import EXT_DIR, IS_DOCKER, SKILLS_DIR, _copy_default_skills, convert_to_opus_simple, load_covs, load_settings, save_covs, save_single_cov, save_settings,clean_temp_files_task,base_path,configure_host_port,UPLOAD_FILES_DIR,AGENT_DIR,MEMORY_CACHE_DIR,KB_DIR,DEFAULT_VRM_DIR,DEFAULT_THA_DIR,THA_USER_MODELS_DIR,SOULX_IMAGES_DIR,USER_DATA_DIR,LOG_DIR,TOOL_TEMP_DIR,COVS_PATH,DATABASE_PATH
+from py.get_setting import EXT_DIR, IS_DOCKER, SKILLS_DIR, _copy_default_skills, convert_to_opus_simple, load_covs, load_settings, save_covs, save_single_cov, save_settings,clean_temp_files_task,base_path,configure_host_port,UPLOAD_FILES_DIR,AGENT_DIR,MEMORY_CACHE_DIR,KB_DIR,DEFAULT_VRM_DIR,DEFAULT_THA_DIR,THA_USER_MODELS_DIR,DEFAULT_SOULX_IMAGES_DIR,SOULX_IMAGES_DIR,USER_DATA_DIR,LOG_DIR,TOOL_TEMP_DIR,COVS_PATH,DATABASE_PATH
 from py.llm_tool import get_image_base64,get_image_media_type
 timetamp = time.time()
 log_path = os.path.join(LOG_DIR, f"backend_{timetamp}.log")
@@ -11624,10 +11624,26 @@ async def upload_soulx_image(
 async def get_soulx_images(request: Request):
     try:
         images = []
+        seen = set()
+        # 默认形象（不可删除，不可被同名覆盖），排在前面
+        default_dir = DEFAULT_SOULX_IMAGES_DIR
+        if os.path.isdir(default_dir):
+            for fname in sorted(os.listdir(default_dir)):
+                if fname.lower().endswith('.png'):
+                    stem = fname[:-4]
+                    seen.add(stem)
+                    images.append({
+                        "id": stem,
+                        "name": stem,
+                        "url": f"/default_soulx_images/{fname}",
+                        "default": True
+                    })
+        # 用户上传的形象
         if os.path.isdir(SOULX_IMAGES_DIR):
             for fname in sorted(os.listdir(SOULX_IMAGES_DIR)):
                 if fname.lower().endswith('.png'):
                     stem = fname[:-4]
+                    if stem in seen: continue
                     images.append({
                         "id": stem,
                         "name": stem,
@@ -11650,6 +11666,10 @@ async def delete_soulx_image(image_id: str):
     try:
         if not re.fullmatch(r'[\w\-]+', image_id):
             return JSONResponse(status_code=400, content={"success": False, "message": "非法的图片id"})
+        # 禁止删除默认形象
+        default_path = os.path.join(DEFAULT_SOULX_IMAGES_DIR, f"{image_id}.png")
+        if os.path.exists(default_path):
+            return JSONResponse(status_code=403, content={"success": False, "message": "默认形象不可删除"})
         path = os.path.join(SOULX_IMAGES_DIR, f"{image_id}.png")
         if not os.path.exists(path):
             return JSONResponse(status_code=404, content={"success": False, "message": "图片不存在"})
@@ -12863,6 +12883,7 @@ mcp.mount()
 
 app.mount("/vrm", StaticFiles(directory=DEFAULT_VRM_DIR), name="vrm")
 app.mount("/tha_models", StaticFiles(directory=DEFAULT_THA_DIR), name="tha_models")
+app.mount("/default_soulx_images", StaticFiles(directory=DEFAULT_SOULX_IMAGES_DIR), name="default_soulx_images")
 app.mount("/tool_temp", StaticFiles(directory=TOOL_TEMP_DIR), name="tool_temp")
 app.mount("/uploaded_files", StaticFiles(directory=UPLOAD_FILES_DIR), name="uploaded_files")
 app.mount("/ext", StaticFiles(directory=EXT_DIR), name="ext")

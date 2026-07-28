@@ -15887,9 +15887,15 @@ function updateElement(el, rawMarkdown, formatFn) {
                                 >
                                   <div class="model-option-item">
                                     <i
+                                      v-if="!img.default"
                                       class="fa-solid fa-trash-can"
                                       style="color: #ff0000; margin-right: 6px;"
                                       @click.stop="deleteSoulxImage(img.id)"
+                                    ></i>
+                                    <i
+                                      v-else
+                                      class="fa-solid fa-lock"
+                                      style="color: #999; margin-right: 6px;"
                                     ></i>
                                     <span>{{ img.name }}</span>
                                   </div>

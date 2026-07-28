@@ -93,6 +93,7 @@ DEFAULT_TTS_DIR = os.path.join(USER_DATA_DIR, 'tts')
 DEFAULT_EBD_DIR = os.path.join(USER_DATA_DIR, 'ebd')
 DEFAULT_THA_DIR = os.path.join(base_path, 'tha_models')
 THA_USER_MODELS_DIR = os.path.join(UPLOAD_FILES_DIR, 'tha_models')
+DEFAULT_SOULX_IMAGES_DIR = os.path.join(base_path, 'default_soulx_images')
 SOULX_IMAGES_DIR = os.path.join(UPLOAD_FILES_DIR, 'soulx_images')
 # --- 跨平台全局Skills路径 ---
 def get_global_skills_dir():
