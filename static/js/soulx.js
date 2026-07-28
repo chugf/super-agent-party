@@ -91,9 +91,9 @@
       selectedImageId = selected.id;
     }
 
-    // 目录模式：FlashHead 服务在本机且有已上传图片时，直接传目录路径，
-    // 服务端一次加载全部图片，之后可用 reset 消息热切换人物
-    directoryMode = !!(selected && soulxImagesDir && isLocalServer(flashheadUrl));
+    // 目录模式：仅用于用户本地上传的图片。默认内置图片走 base64 模式
+    var isDefaultImage = selected && selected.default === true;
+    directoryMode = !!(selected && !isDefaultImage && soulxImagesDir && isLocalServer(flashheadUrl));
 
     if (selected) {
       condImageSrc = selected.url;
