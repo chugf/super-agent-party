@@ -1899,6 +1899,17 @@ function updateElement(el, rawMarkdown, formatFn) {
                         </el-button>
                       </el-tooltip>
 
+                      <el-tooltip :content="t('startSoulxPet')" placement="top">
+                        <el-button
+                          @click="startSoulx"
+                          class="icon-btn soulx-btn"
+                          :type="'default'"
+                          v-if="MoreButtonDict.find(b => b.name === 'soulxButton')?.enabled"
+                          circle>
+                          <i :class='isSoulxStarting? "fa-solid fa-spinner fa-spin" : "fa-solid fa-face-laugh-beam"'></i>
+                        </el-button>
+                      </el-tooltip>
+
                       <el-tooltip :content="t('enableAutoBehavior')" placement="top">
                         <el-button
                           @click="behaviorSettings.enabled=!behaviorSettings.enabled; autoSaveSettings();"
