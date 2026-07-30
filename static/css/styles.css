@@ -1541,10 +1541,14 @@ body {
   }
 
   .el-main {
-    padding: 0!important;
-    margin: 0!important;
+      padding: 0!important;
+      margin: 0!important;
+    }
   }
-}
+
+  .el-main {
+    padding: 0 !important;
+  }
 
 @media (max-width: 680px) {
   .message {
