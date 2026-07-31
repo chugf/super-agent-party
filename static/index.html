@@ -6731,7 +6731,7 @@ function updateElement(el, rawMarkdown, formatFn) {
                           <div class="vendor-select-row-content">
                             <span class="vendor-select-name">{{ formatVendorName(t(item.label)) }}</span>
                             <span class="vendor-select-category">
-                              {{ item.value === 'custom' || item.value === 'customAnthropic' ? t('custom') : localVendors.includes(item.value) ? t('localModel') : t('cloudModel') }}
+                              {{ item.value === 'custom' || item.value === 'customAnthropic' || item.value === 'OpenAIResponses' ? t('custom') : localVendors.includes(item.value) ? t('localModel') : t('cloudModel') }}
                             </span>
                           </div>
                           <div class="vendor-select-indicator">
