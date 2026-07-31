@@ -69,16 +69,24 @@ class AsyncResponsesAsOpenAI:
                     client = httpx.AsyncClient()
                     need_close = True
 
-                response = await client.get(url, headers=headers)
+                get_kwargs = {"headers": headers}
+                if self._parent.timeout is not None:
+                    get_kwargs["timeout"] = self._parent.timeout
 
-                if need_close:
-                    await client.aclose()
+                try:
+                    response = await client.get(url, **get_kwargs)
+                finally:
+                    # 本地创建的客户端无论成功/异常都必须关闭，避免连接泄漏
+                    if need_close:
+                        await client.aclose()
 
                 if response.status_code == 200:
                     data = response.json()
                     models = [ModelItem(m["id"]) for m in data.get("data", [])]
                     if models:
                         return ModelList(models)
+                else:
+                    print(f"获取 OpenAI Responses 模型列表失败: HTTP {response.status_code}")
             except Exception as e:
                 print(f"动态获取 OpenAI Responses 模型列表失败 (可能代理/服务商不支持): {e}")
 

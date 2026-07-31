@@ -63,6 +63,8 @@ MODELS_RESPONSE = {"object": "list", "data": [{"id": "gpt-4o"}, {"id": "gpt-5"}]
 
 
 class MockHandler(BaseHTTPRequestHandler):
+    fail_models = False
+
     def do_POST(self):
         length = int(self.headers.get("Content-Length", 0))
         body = json.loads(self.rfile.read(length) or b"{}")
@@ -88,6 +90,10 @@ class MockHandler(BaseHTTPRequestHandler):
 
     def do_GET(self):
         if self.path.endswith("/models"):
+            if MockHandler.fail_models:
+                self.send_response(500)
+                self.end_headers()
+                return
             payload = json.dumps(MODELS_RESPONSE).encode()
             self.send_response(200)
             self.send_header("Content-Type", "application/json")
@@ -157,6 +163,24 @@ async def main():
         }],
     )
     assert resp2.choices[0].message.content == "Hello World", resp2
+
+    # 5. responses/ 前缀重写分支 (responses/gpt-4o -> openai/responses/gpt-4o) 不报错
+    resp3 = await adapter.chat.completions.create(
+        model="responses/gpt-4o",
+        messages=[{"role": "user", "content": "hi"}],
+    )
+    assert resp3.choices[0].message.content == "Hello World", resp3
+
+    # 6. 模型列表请求失败时返回空列表兜底
+    adapter2 = AsyncResponsesAsOpenAI(
+        api_key="test-key",
+        base_url=f"http://127.0.0.1:{port}/v1",
+        http_client=http_client,
+    )
+    MockHandler.fail_models = True
+    models2 = await adapter2.models.list()
+    assert models2.data == [], models2.data
+    MockHandler.fail_models = False
 
     await http_client.aclose()
     server.shutdown()
