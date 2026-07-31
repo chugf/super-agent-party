@@ -471,6 +471,7 @@ import argparse
 from py.dify_openai import DifyOpenAIAsync
 from py.ClaudeAsOpenAI import AsyncClaudeAsOpenAI
 from py.GeminiAsOpenAI import AsyncGeminiAsOpenAI
+from py.ResponsesAsOpenAI import AsyncResponsesAsOpenAI
 from py.get_setting import EXT_DIR, IS_DOCKER, SKILLS_DIR, _copy_default_skills, convert_to_opus_simple, load_covs, load_settings, save_covs, save_single_cov, save_settings,clean_temp_files_task,base_path,configure_host_port,UPLOAD_FILES_DIR,AGENT_DIR,MEMORY_CACHE_DIR,KB_DIR,DEFAULT_VRM_DIR,DEFAULT_THA_DIR,THA_USER_MODELS_DIR,DEFAULT_SOULX_IMAGES_DIR,SOULX_IMAGES_DIR,USER_DATA_DIR,LOG_DIR,TOOL_TEMP_DIR,COVS_PATH,DATABASE_PATH
 from py.llm_tool import get_image_base64,get_image_media_type
 timetamp = time.time()
@@ -743,6 +744,8 @@ def get_client_class(config, provider_id):
         return AsyncClaudeAsOpenAI
     elif vendor == 'Gemini':
         return AsyncGeminiAsOpenAI
+    elif vendor == 'OpenAIResponses':
+        return AsyncResponsesAsOpenAI
     else: 
         return AsyncOpenAI
 
@@ -7052,6 +7055,13 @@ async def fetch_provider_models(request: ProviderModelRequest):
         # 2. 拦截 Gemini
         elif vendor == 'Gemini':
             client = AsyncGeminiAsOpenAI(
+                api_key=request.api_key,
+                base_url=request.url,
+                http_client=global_http_client
+            )
+        # 2.5 拦截 OpenAI Responses API
+        elif vendor == 'OpenAIResponses':
+            client = AsyncResponsesAsOpenAI(
                 api_key=request.api_key,
                 base_url=request.url,
                 http_client=global_http_client
