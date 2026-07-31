@@ -2,9 +2,9 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** 新增 `OpenAIResponses` vendor 类型,通过 litellm 的 `responses/` 桥接接入 OpenAI Responses API 端点。
+**Goal:** 新增 `OpenAIResponses` vendor 类型,通过 litellm 的 `openai/responses/` 前缀桥接接入 OpenAI Responses API 端点。
 
-**Architecture:** 新建 `py/ResponsesAsOpenAI.py` 适配器,完全模拟 `AsyncOpenAI` 接口(`chat.completions.create` / `models.list`),内部以 `model="responses/<model>"` 调用 `litellm.acompletion()`。litellm 1.83.13 内置的 `responses_api_bridge` 自动完成 Chat Completions ↔ Responses API 双向转换(消息→input、tools、流式事件、usage、reasoning_content)。`server.py` 按 vendor 分发到新适配器,前端新增 vendor 选项。
+**Architecture:** 新建 `py/ResponsesAsOpenAI.py` 适配器,完全模拟 `AsyncOpenAI` 接口(`chat.completions.create` / `models.list`),内部以 `model="openai/responses/<model>"` 调用 `litellm.acompletion()`。litellm 1.83.13 内置的 `responses_api_bridge` 自动完成 Chat Completions ↔ Responses API 双向转换(消息→input、tools、流式事件、usage、reasoning_content)。注意:必须带 `openai/` 路由前缀——裸 `responses/<model>` 无法在 `get_llm_provider` 解析 provider(抛 BadRequestError),`openai/responses/<model>` 剥掉 `openai/` 后剩 `responses/<model>` 才命中桥接。`server.py` 按 vendor 分发到新适配器,前端新增 vendor 选项。
 
 **Tech Stack:** Python 3.12, litellm>=1.83.7(当前 1.83.13,已含桥接), FastAPI, Vue 3(内联 JS), Electron。
 
@@ -38,7 +38,7 @@ from typing import Optional, List, Dict, Any
 
 class AsyncResponsesAsOpenAI:
     """
-    完全模拟 AsyncOpenAI 客户端，底层用 litellm.acompletion 的 responses/ 前缀桥接
+    完全模拟 AsyncOpenAI 客户端，底层用 litellm.acompletion 的 openai/responses/ 前缀桥接
     (litellm 自动完成 Chat Completions <-> Responses API 双向转换)
     """
 
@@ -149,9 +149,14 @@ class AsyncResponsesAsOpenAI:
                 if not model:
                     raise ValueError("model is required")
 
-                # responses/ 前缀触发 litellm 的 responses_api_bridge
-                if not model.startswith("responses/"):
-                    model = f"responses/{model}"
+                # openai/responses/ 前缀触发 litellm 的 responses_api_bridge
+                # (注意: litellm 1.83.x 中裸 "responses/" 前缀无法在 get_llm_provider 解析 provider,
+                #  必须带 "openai/" 路由前缀; 桥接内部会把模型名去掉前缀再调 /responses 端点)
+                if model.startswith("responses/"):
+                    # responses/gpt-4o -> openai/responses/gpt-4o
+                    model = f"openai/{model}"
+                elif not model.startswith("openai/responses/"):
+                    model = f"openai/responses/{model}"
 
                 # ===== 懒加载 litellm =====
                 litellm = self._parent._litellm
@@ -362,7 +367,7 @@ Expected: 无输出,退出码 0
 
 ```bash
 git add py/ResponsesAsOpenAI.py tests/test_responses_adapter.py
-git commit -m "feat: 新增 OpenAI Responses API 模型提供商适配器 (litellm responses/ 桥接)"
+git commit -m "feat: 新增 OpenAI Responses API 模型提供商适配器 (litellm openai/responses/ 桥接)"
 ```
 
 ---

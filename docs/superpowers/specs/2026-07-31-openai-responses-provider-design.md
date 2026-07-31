@@ -14,7 +14,9 @@
 
 ## 技术背景
 
-litellm 1.83.13 内置 `responses_api_bridge`(`litellm/completion_extras/litellm_responses_transformation/`),当 `litellm.acompletion(model="responses/<model>", ...)` 时自动:
+litellm 1.83.13 内置 `responses_api_bridge`(`litellm/completion_extras/litellm_responses_transformation/`),当 `litellm.acompletion(model="openai/responses/<model>", ...)` 时自动:
+
+> **注意:必须带 `openai/` 路由前缀。** litellm 1.83.13 的 `get_llm_provider` 无法解析裸 `responses/<model>` 的 provider(抛 BadRequestError);`openai/responses/<model>` 会先按 `openai/` 解析出 provider,路径剥成 `responses/<model>` 后命中 `responses_api_bridge`。
 
 - 将 Chat Completions 请求转换为 Responses API 请求(`messages` → `input` items,含 tool 结果消息 → `function_call_output`)
 - `tools` 自动转换为 Responses 格式(`{type: "function", name, description, parameters}`)
@@ -29,9 +31,9 @@ litellm 1.83.13 内置 `responses_api_bridge`(`litellm/completion_extras/litellm
 
 ### 方案选择
 
-选 **方案 A:新适配器 + 新 vendor,走 litellm `responses/` 前缀桥接**。
+选 **方案 A:新适配器 + 新 vendor,走 litellm `openai/responses/` 前缀桥接**。
 
-- 方案 A:新建 `py/ResponsesAsOpenAI.py` 模拟 AsyncOpenAI 接口,内部 `litellm.acompletion(model="responses/<model>", ...)`。代码量小(~150 行),格式转换全部由 litellm 维护,主聊天/推理/深度搜索/`/v1/chat/completions` 所有路径自动生效
+- 方案 A:新建 `py/ResponsesAsOpenAI.py` 模拟 AsyncOpenAI 接口,内部 `litellm.acompletion(model="openai/responses/<model>", ...)`。代码量小(~150 行),格式转换全部由 litellm 维护,主聊天/推理/深度搜索/`/v1/chat/completions` 所有路径自动生效
 - 方案 B(弃):直接用 `litellm.aresponses()` 并在适配器内自行转换消息/工具/流格式,代码量 3-4 倍且易出兼容 bug
 - 方案 C(弃):改造现有 `custom` vendor 加开关,与现有 customAnthropic 模式不一致
 
@@ -43,7 +45,7 @@ litellm 1.83.13 内置 `responses_api_bridge`(`litellm/completion_extras/litellm
 server.py get_client_class() 分发 → AsyncResponsesAsOpenAI (py/ResponsesAsOpenAI.py)
     ↓ 模拟 AsyncOpenAI 接口 (chat.completions.create / models.list)
     ↓
-litellm.acompletion(model="responses/<model>", api_base=url, ...)
+litellm.acompletion(model="openai/responses/<model>", api_base=url, ...)
     ↓ responses_api_bridge
     ↓
 litellm.aresponses() → POST {base}/responses
@@ -61,7 +63,7 @@ litellm.aresponses() → POST {base}/responses
 - `__init__(api_key, base_url=None, default_model=None, http_client=None, timeout=None, max_retries=None, **kwargs)` — 签名与 `AsyncClaudeAsOpenAI` 一致
 - `_litellm` 属性:懒加载 `import litellm` 并缓存
 - `chat.completions.create(model, messages, temperature, max_tokens, stream, top_p, stop, tools, tool_choice, **kwargs)`:
-  - model 前缀 `responses/`(若未带前缀)
+  - model 前缀 `openai/responses/`(未带前缀时补全;`responses/x` 输入先改写为 `openai/responses/x`,litellm 剥掉 `openai/` 后按 `responses/` 触发桥接)
   - 组装 kwargs:`model`、`messages`、`api_key`、`api_base=base_url`、`stream`、`temperature`、`max_tokens`、`top_p`、`stop`、`timeout`、`client=http_client`(复用全局代理客户端)
   - `tools`、`tool_choice` 原样透传(桥接自动转换)
   - 过滤 kwargs 中 `logprobs`、`top_logprobs`、`n` 三个桥接不支持的参数,其余(含 `response_format`、`reasoning_effort`)透传
