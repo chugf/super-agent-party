@@ -5593,7 +5593,7 @@ formatMessage(content, index) {
         'tencent': 'https://api.lkeap.cloud.tencent.com/v1',
       }
       
-      if (value !== 'custom' && value !== 'customAnthropic' ) {
+      if (value !== 'custom' && value !== 'customAnthropic' && value !== 'OpenAIResponses') {
         this.newProviderTemp.url = defaultUrls[value] || ''
       }
       if (value === 'Ollama') {
@@ -8593,7 +8593,7 @@ handleCreateSlackSeparator(val) {
             url = url.slice(0, -3);
           }
         }
-        else if (provider.vendor === 'customAnthropic'){
+        else if (provider.vendor === 'customAnthropic' || provider.vendor === 'OpenAIResponses'){
           url = provider.url;
         }
         else {
