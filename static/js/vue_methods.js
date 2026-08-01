@@ -3655,6 +3655,8 @@ formatMessage(content, index) {
             }
 
             if (this.ttsSettings.enabled) {
+                // 提前通知：音频输入已全部送出，让 FlashHead 提前生成尾部残帧，避免结尾画面定格
+                setTimeout(() => { this.sendTTSStatusToVRM('audioInputComplete', {}); }, 0);
                 if (this.audioStartTime > this.audioCtx.currentTime) {
                     const remainingTime = (this.audioStartTime - this.audioCtx.currentTime) * 1000;
                     setTimeout(() => { this.sendTTSStatusToVRM('allChunksCompleted', {}); }, remainingTime);
