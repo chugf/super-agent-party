@@ -4953,7 +4953,15 @@ async def generate_stream_response(client, reasoner_client, request: ChatRequest
                         )
 
                 reasoner_messages = copy.deepcopy(request.messages)
+                drs_rounds = 0
+                MAX_DRS_ROUNDS = 10
                 while tool_calls or search_not_done:
+                    drs_rounds += 1
+                    if drs_rounds > MAX_DRS_ROUNDS:
+                        print(f"[DeepSearch] 达到最大轮数 {MAX_DRS_ROUNDS}，强制结束深度研究循环")
+                        search_not_done = False
+                        tool_calls = []
+                        break
                     full_content = ""
                     if tool_calls:
                         # 1. 组装并保存 assistant 消息中的 tool_calls 列表
