@@ -3981,8 +3981,8 @@ async def generate_stream_response(client, reasoner_client, request: ChatRequest
                 if recent:
                     diary_lines = []
                     for e in recent:
-                        t = e.get("title", "") or e.get("content", "")[:24]
-                        diary_lines.append(f"- [{e.get('time', '')[:16]}] ({e.get('type', '')}) {t}: {e.get('content', '')[:200]}")
+                        diary_title = e.get("title", "") or e.get("content", "")[:24]
+                        diary_lines.append(f"- [{e.get('time', '')[:16]}] ({e.get('type', '')}) {diary_title}: {e.get('content', '')[:200]}")
                     diary_text = "\n".join(diary_lines)
                     content_append(request.messages, 'system',
                         "\n\n[角色日记 - 近期回忆]\n以下是该角色最近的日记记录，可供你参考其心境和经历：\n" + diary_text + "\n")
