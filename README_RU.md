@@ -109,20 +109,20 @@ curl -fsSL https://raw.githubusercontent.com/heshengtao/super-agent-party/main/R
 
 ### Windows portable пакет (Рекомендуется! Версия без установки, поддержка одно-click синхронизации с последней версией репозитория, не нужно ждать сборки десктопной версии)
 
-  👉 [Скачать](https://github.com/heshengtao/super-agent-party/releases/download/v0.4.2/super-agent-party-win-v0.4.2.zip)
+  👉 [Скачать](https://github.com/heshengtao/super-agent-party/releases/download/v0.4.3/super-agent-party-win-v0.4.3.zip)
 
 ⭐ Примечание! Вы можете дважды кликнуть `一键更新(update).bat` для обновления или `一键启动(start).bat` для запуска. Операционная система должна быть **Windows 10/11, Windows Server 2025** или новее!
 
 ### Windows Desktop Installation
 
-  👉 [Скачать](https://github.com/heshengtao/super-agent-party/releases/download/v0.4.2/Super-Agent-Party-Setup-0.4.2.exe)
+  👉 [Скачать](https://github.com/heshengtao/super-agent-party/releases/download/v0.4.3/Super-Agent-Party-Setup-0.4.3.exe)
 
 ⭐ Примечание! При установке выберите установку только для текущего пользователя, иначе для запуска потребуются права администратора. Операционная система должна быть **Windows 10/11, Windows Server 2025** или новее!
 
 ### MacOS Integrated Package (В настоящее время поддерживает только M-чипы, версия без установки, поддержка одно-click синхронизации с последней версией репозитория, не нужно ждать сборки десктопной версии)
 > **Подходит для разработчиков/продвинутых пользователей**: версия без установки, поддержка одно-click синхронизации с последней версией репозитория, не нужно ждать сборки десктопной версии.
 
-👉 [Скачать](https://github.com/heshengtao/super-agent-party/releases/download/v0.4.2/super-agent-party-mac-v0.4.2.zip)
+👉 [Скачать](https://github.com/heshengtao/super-agent-party/releases/download/v0.4.3/super-agent-party-mac-v0.4.3.zip)
 
 #### 🚀 Инструкция по использованию
 
@@ -145,7 +145,7 @@ chmod +x 一键更新(update).sh 一键启动(start).sh
 
 ### Установка MacOS Desktop (В настоящее время поддерживаются только M-чипы)
 
-  👉 [Скачать](https://github.com/heshengtao/super-agent-party/releases/download/v0.4.2/Super-Agent-Party-0.4.2-Mac.dmg)
+  👉 [Скачать](https://github.com/heshengtao/super-agent-party/releases/download/v0.4.3/Super-Agent-Party-0.4.3-Mac.dmg)
 
 ⭐ Внимание! После загрузки перетащите приложение из dmg-файла в директорию `/Applications`, затем откройте Терминал, выполните следующую команду и введите root-пароль для снятия атрибута карантина:
 
@@ -157,9 +157,9 @@ chmod +x 一键更新(update).sh 一键启动(start).sh
 
 `.AppImage` — это формат приложений Linux, не требующий установки и готовый к использованию сразу. Подходит для большинства дистрибутивов Linux.
 
-👉 [Linux-AppImage-X86_64](https://github.com/heshengtao/super-agent-party/releases/download/v0.4.2/Super-Agent-Party-0.4.2-Linux-x86_64.AppImage)
+👉 [Linux-AppImage-X86_64](https://github.com/heshengtao/super-agent-party/releases/download/v0.4.3/Super-Agent-Party-0.4.3-Linux-x86_64.AppImage)
 
-👉 [Linux-AppImage-Arm64](https://github.com/heshengtao/super-agent-party/releases/download/v0.4.2/Super-Agent-Party-0.4.2-Linux-arm64.AppImage)
+👉 [Linux-AppImage-Arm64](https://github.com/heshengtao/super-agent-party/releases/download/v0.4.3/Super-Agent-Party-0.4.3-Linux-arm64.AppImage)
 
 ### Docker Deployment (Эту версию десктопного питомца можно просматривать только через браузер)
 

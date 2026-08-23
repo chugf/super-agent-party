@@ -109,20 +109,20 @@ curl -fsSL https://raw.githubusercontent.com/heshengtao/super-agent-party/main/R
 
 ### Windows 휴대용 패키지 (권장! 설치 불필요 소스 버전, 최신 리포지토리로 원클릭 동기화 지원, 데스크톱 버전 패키징 대기 불필요)
 
-  👉 [다운로드](https://github.com/heshengtao/super-agent-party/releases/download/v0.4.2/super-agent-party-win-v0.4.2.zip)
+  👉 [다운로드](https://github.com/heshengtao/super-agent-party/releases/download/v0.4.3/super-agent-party-win-v0.4.3.zip)
 
 ⭐ 참고! `一键更新(update).bat`를 더블 클릭하여 소프트웨어를 업데이트하거나, `一键启动(start).bat`를 더블 클릭하여 소프트웨어를 시작할 수 있습니다. 운영 체제는 **Windows 10/11, Windows Server 2025** 이상이어야 합니다!
 
 ### Windows 데스크톱 설치
 
-  👉 [다운로드](https://github.com/heshengtao/super-agent-party/releases/download/v0.4.2/Super-Agent-Party-Setup-0.4.2.exe)
+  👉 [다운로드](https://github.com/heshengtao/super-agent-party/releases/download/v0.4.3/Super-Agent-Party-Setup-0.4.3.exe)
 
 ⭐ 참고! 설치 시 현재 사용자에 대해서만 설치를 선택하세요. 그렇지 않으면 시작 시 관리자 권한이 필요합니다. 운영 체제는 **Windows 10/11, Windows Server 2025** 이상이어야 합니다!
 
 ### MacOS 통합 패키지 (현재 M 칩만 지원, 설치 불필요 소스 코드 버전, 최신 리포지토리로 원클릭 동기화 지원, 데스크톱 버전 패키징 대기 불필요)
 > **개발자/고급 사용자 대상**: 설치 불필요 소스 코드 버전, 최신 리포지토리로 원클릭 동기화 지원, 데스크톱 버전 패키징 대기 불필요.
 
-👉 [다운로드](https://github.com/heshengtao/super-agent-party/releases/download/v0.4.2/super-agent-party-mac-v0.4.2.zip)
+👉 [다운로드](https://github.com/heshengtao/super-agent-party/releases/download/v0.4.3/super-agent-party-mac-v0.4.3.zip)
 
 #### 🚀 사용 방법
 
@@ -145,7 +145,7 @@ chmod +x 一键更新(update).sh 一键启动(start).sh
 
 ### MacOS 데스크톱 설치 (현재 M 칩만 지원)
 
-  👉 [다운로드](https://github.com/heshengtao/super-agent-party/releases/download/v0.4.2/Super-Agent-Party-0.4.2-Mac.dmg)
+  👉 [다운로드](https://github.com/heshengtao/super-agent-party/releases/download/v0.4.3/Super-Agent-Party-0.4.3-Mac.dmg)
 
 ⭐ 주의! 다운로드 후, dmg 파일의 앱을 `/Applications` 디렉토리로 드래그한 다음, 터미널을 열고 다음 명령어를 실행하여 루트 비밀번호를 입력하면 네트워크 다운로드에 부여된 Quarantine 속성이 제거됩니다:
 
@@ -157,9 +157,9 @@ chmod +x 一键更新(update).sh 一键启动(start).sh
 
 `.AppImage`는 설치가 필요 없으며 즉시 사용할 수 있는 Linux 애플리케이션 형식입니다. 대부분의 Linux 배포판에 적합합니다.
 
-👉 [Linux-AppImage-X86_64](https://github.com/heshengtao/super-agent-party/releases/download/v0.4.2/Super-Agent-Party-0.4.2-Linux-x86_64.AppImage)
+👉 [Linux-AppImage-X86_64](https://github.com/heshengtao/super-agent-party/releases/download/v0.4.3/Super-Agent-Party-0.4.3-Linux-x86_64.AppImage)
 
-👉 [Linux-AppImage-Arm64](https://github.com/heshengtao/super-agent-party/releases/download/v0.4.2/Super-Agent-Party-0.4.2-Linux-arm64.AppImage)
+👉 [Linux-AppImage-Arm64](https://github.com/heshengtao/super-agent-party/releases/download/v0.4.3/Super-Agent-Party-0.4.3-Linux-arm64.AppImage)
 
 ### Docker 배포 (이 버전의 데스크톱 펫은 브라우저를 통해서만 볼 수 있습니다.)
 

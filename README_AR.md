@@ -109,20 +109,20 @@ curl -fsSL https://raw.githubusercontent.com/heshengtao/super-agent-party/main/R
 
 ### حزمة Windows المحمولة (موصى بها! نسخة المصدر بدون تثبيت، تدعم المزامنة بنقرة واحدة لأحدث إصدار من المستودع، لا حاجة لانتظار تعبئة إصدار سطح المكتب)
 
-  👉 [انقر للتحميل](https://github.com/heshengtao/super-agent-party/releases/download/v0.4.2/super-agent-party-win-v0.4.2.zip)
+  👉 [انقر للتحميل](https://github.com/heshengtao/super-agent-party/releases/download/v0.4.3/super-agent-party-win-v0.4.3.zip)
 
 ⭐ ملاحظة! يمكنك النقر双击 على `一键更新(update).bat` لتحديث البرنامج، أو النقر双击 على `一键启动(start).bat` لبدء تشغيل البرنامج. يجب أن يكون نظام التشغيل **Windows 10/11، Windows Server 2025**، أو إصدار أحدث!
 
 ### تثبيت سطح المكتب لنظام Windows
 
-  👉 [انقر للتحميل](https://github.com/heshengtao/super-agent-party/releases/download/v0.4.2/Super-Agent-Party-Setup-0.4.2.exe)
+  👉 [انقر للتحميل](https://github.com/heshengtao/super-agent-party/releases/download/v0.4.3/Super-Agent-Party-Setup-0.4.3.exe)
 
 ⭐ ملاحظة! اختر التثبيت للمستخدم الحالي فقط أثناء التثبيت، وإلا ستكون صلاحيات المسؤول مطلوبة للبدء. يجب أن يكون نظام التشغيل **Windows 10/11، Windows Server 2025**، أو إصدار أحدث!
 
 ### حزمة MacOS المتكاملة (تدعم حاليًا شرائح M فقط، نسخة المصدر بدون تثبيت، تدعم المزامنة بنقرة واحدة لأحدث إصدار من المستودع، لا حاجة لانتظار تعبئة إصدار سطح المكتب)
 > **مناسبة للمطورين/المستخدمين المتقدمين**: نسخة المصدر بدون تثبيت، تدعم المزامنة بنقرة واحدة لأحدث إصدار من المستودع، لا حاجة لانتظار تعبئة إصدار سطح المكتب.
 
-👉 [انقر للتحميل](https://github.com/heshengtao/super-agent-party/releases/download/v0.4.2/super-agent-party-mac-v0.4.2.zip)
+👉 [انقر للتحميل](https://github.com/heshengtao/super-agent-party/releases/download/v0.4.3/super-agent-party-mac-v0.4.3.zip)
 
 #### 🚀 خطوات الاستخدام
 
@@ -145,7 +145,7 @@ chmod +x 一键更新(update).sh 一键启动(start).sh
 
 ### تثبيت سطح المكتب لنظام MacOS (تدعم حاليًا شرائح M فقط.)
 
-  👉 [انقر للتحميل](https://github.com/heshengtao/super-agent-party/releases/download/v0.4.2/Super-Agent-Party-0.4.2-Mac.dmg)
+  👉 [انقر للتحميل](https://github.com/heshengtao/super-agent-party/releases/download/v0.4.3/Super-Agent-Party-0.4.3-Mac.dmg)
 
 ⭐تنبيه! بعد التنزيل، اسحب ملف التطبيق من ملف dmg إلى دليل `/Applications`، ثم افتح الطرفية، ونفذ الأمر التالي وأدخل كلمة مرور الجذر لإزالة سمة الحجر الصحي المرتبطة من تنزيل الشبكة:
 
@@ -157,9 +157,9 @@ chmod +x 一键更新(update).sh 一键启动(start).sh
 
 `.AppImage` هو تنسيق تطبيقات Linux لا يتطلب التثبيت ويمكن استخدامه فورًا. مناسب لمعظم توزيعات Linux.
 
-👉 [Linux-AppImage-X86_64](https://github.com/heshengtao/super-agent-party/releases/download/v0.4.2/Super-Agent-Party-0.4.2-Linux-x86_64.AppImage)
+👉 [Linux-AppImage-X86_64](https://github.com/heshengtao/super-agent-party/releases/download/v0.4.3/Super-Agent-Party-0.4.3-Linux-x86_64.AppImage)
 
-👉 [Linux-AppImage-Arm64](https://github.com/heshengtao/super-agent-party/releases/download/v0.4.2/Super-Agent-Party-0.4.2-Linux-arm64.AppImage)
+👉 [Linux-AppImage-Arm64](https://github.com/heshengtao/super-agent-party/releases/download/v0.4.3/Super-Agent-Party-0.4.3-Linux-arm64.AppImage)
 
 ### نشر Docker (يمكن مشاهدة هذا الإصدار من الحيوان الأليف المكتبي فقط من خلال المتصفح)
 

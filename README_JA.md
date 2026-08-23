@@ -109,20 +109,20 @@ curl -fsSL https://raw.githubusercontent.com/heshengtao/super-agent-party/main/R
 
 ### Windowsポータブルパッケージ（推奨！インストール不要のソースバージョン、最新リポジトリへのワンクリック同期対応、デスクトップ版のパッケージングを待つ必要なし）
 
-  👉 [ダウンロードはこちら](https://github.com/heshengtao/super-agent-party/releases/download/v0.4.2/super-agent-party-win-v0.4.2.zip)
+  👉 [ダウンロードはこちら](https://github.com/heshengtao/super-agent-party/releases/download/v0.4.3/super-agent-party-win-v0.4.3.zip)
 
 ⭐ 注意！ `一键更新(update).bat` をダブルクリックしてソフトウェアを更新するか、`一键启动(start).bat` をダブルクリックしてソフトウェアを起動できます。OSは **Windows 10/11、Windows Server 2025** 以降が必要です！
 
 ### Windowsデスクトップインストール
 
-  👉 [ダウンロードはこちら](https://github.com/heshengtao/super-agent-party/releases/download/v0.4.2/Super-Agent-Party-Setup-0.4.2.exe)
+  👉 [ダウンロードはこちら](https://github.com/heshengtao/super-agent-party/releases/download/v0.4.3/Super-Agent-Party-Setup-0.4.3.exe)
 
 ⭐ 注意！ インストール時に「現在のユーザーのみにインストール」を選択してください。そうしないと、起動時に管理者権限が必要になります。OSは **Windows 10/11、Windows Server 2025** 以降が必要です！
 
 ### MacOS 統合パッケージ（現在はMチップのみ対応、インストール不要のソースコード版、ワンクリックでリポジトリ最新版に同期可能、デスクトップ版のパッケージ化待ち不要）
 > **開発者/上級ユーザー向け**：インストール不要のソースコード版、ワンクリックでリポジトリ最新版に同期可能、デスクトップ版のパッケージ化待ち不要。
 
-👉 [国際ユーザーはこちらをクリックしてダウンロード](https://github.com/heshengtao/super-agent-party/releases/download/v0.4.2/super-agent-party-mac-v0.4.2.zip) 
+👉 [国際ユーザーはこちらをクリックしてダウンロード](https://github.com/heshengtao/super-agent-party/releases/download/v0.4.3/super-agent-party-mac-v0.4.3.zip) 
 
 #### 🚀 使用方法
 
@@ -145,7 +145,7 @@ chmod +x 一键更新(update).sh 一键启动(start).sh
 
 ### macOSデスクトップインストール（現在Mチップのみ対応）
 
-  👉 [ダウンロードはこちら](https://github.com/heshengtao/super-agent-party/releases/download/v0.4.2/Super-Agent-Party-0.4.2-Mac.dmg)
+  👉 [ダウンロードはこちら](https://github.com/heshengtao/super-agent-party/releases/download/v0.4.3/Super-Agent-Party-0.4.3-Mac.dmg)
 
 ⭐ 注意！ ダウンロード後、dmgファイルのアプリを `/Applications` ディレクトリにドラッグしてください。その後、ターミナルを開き、以下のコマンドを実行してルートパスワードを入力し、ネットワークダウンロードに付与されたQuarantine属性を削除してください：
 
@@ -155,9 +155,9 @@ chmod +x 一键更新(update).sh 一键启动(start).sh
 
 ### Linuxデスクトップインストール
 
-👉 [Linux-AppImage-X86_64](https://github.com/heshengtao/super-agent-party/releases/download/v0.4.2/Super-Agent-Party-0.4.2-Linux-x86_64.AppImage)
+👉 [Linux-AppImage-X86_64](https://github.com/heshengtao/super-agent-party/releases/download/v0.4.3/Super-Agent-Party-0.4.3-Linux-x86_64.AppImage)
 
-👉 [Linux-AppImage-Arm64](https://github.com/heshengtao/super-agent-party/releases/download/v0.4.2/Super-Agent-Party-0.4.2-Linux-arm64.AppImage)
+👉 [Linux-AppImage-Arm64](https://github.com/heshengtao/super-agent-party/releases/download/v0.4.3/Super-Agent-Party-0.4.3-Linux-arm64.AppImage)
 
 ### Dockerデプロイ（このバージョンのデスクトップペットはブラウザからのみ閲覧できます。）
 

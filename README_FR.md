@@ -109,20 +109,20 @@ curl -fsSL https://raw.githubusercontent.com/heshengtao/super-agent-party/main/R
 
 ### Package portable Windows (Recommandé ! Version source sans installation, prend en charge la synchronisation en un clic avec la dernière version du dépôt, pas besoin d'attendre le package de la version de bureau)
 
-  👉 [Télécharger](https://github.com/heshengtao/super-agent-party/releases/download/v0.4.2/super-agent-party-win-v0.4.2.zip)
+  👉 [Télécharger](https://github.com/heshengtao/super-agent-party/releases/download/v0.4.3/super-agent-party-win-v0.4.3.zip)
 
 ⭐ Note ! Vous pouvez double-cliquer sur `一键更新(update).bat` pour mettre à jour le logiciel, ou double-cliquer sur `一键启动(start).bat` pour le démarrer. Le système d'exploitation doit être **Windows 10/11, Windows Server 2025** ou une version ultérieure !
 
 ### Installation bureau Windows
 
-  👉 [Télécharger](https://github.com/heshengtao/super-agent-party/releases/download/v0.4.2/Super-Agent-Party-Setup-0.4.2.exe)
+  👉 [Télécharger](https://github.com/heshengtao/super-agent-party/releases/download/v0.4.3/Super-Agent-Party-Setup-0.4.3.exe)
 
 ⭐ Note ! Choisissez d'installer uniquement pour l'utilisateur actuel lors de l'installation, sinon des privilèges administrateur seront nécessaires au démarrage. Le système d'exploitation doit être **Windows 10/11, Windows Server 2025** ou une version ultérieure !
 
 ### Package intégré MacOS (Actuellement uniquement compatible avec les puces M, version source sans installation, prend en charge la synchronisation en un clic avec la dernière version du dépôt, pas besoin d'attendre le package de la version de bureau)
 > **Destiné aux développeurs/utilisateurs avancés** : Version source sans installation, prend en charge la synchronisation en un clic avec la dernière version du dépôt, pas besoin d'attendre le package de la version de bureau.
 
-👉 [Télécharger](https://github.com/heshengtao/super-agent-party/releases/download/v0.4.2/super-agent-party-mac-v0.4.2.zip)
+👉 [Télécharger](https://github.com/heshengtao/super-agent-party/releases/download/v0.4.3/super-agent-party-mac-v0.4.3.zip)
 
 #### 🚀 Étapes d'utilisation
 
@@ -145,7 +145,7 @@ chmod +x 一键更新(update).sh 一键启动(start).sh
 
 ### Installation bureau macOS (Actuellement uniquement compatible avec les puces M)
 
-  👉 [Télécharger](https://github.com/heshengtao/super-agent-party/releases/download/v0.4.2/Super-Agent-Party-0.4.2-Mac.dmg)
+  👉 [Télécharger](https://github.com/heshengtao/super-agent-party/releases/download/v0.4.3/Super-Agent-Party-0.4.3-Mac.dmg)
 
 ⭐ Attention ! Après le téléchargement, faites glisser l'application du fichier dmg dans le répertoire `/Applications`, puis ouvrez le terminal, exécutez la commande suivante et entrez le mot de passe root pour supprimer l'attribut de quarantaine attaché au téléchargement réseau :
 
@@ -157,9 +157,9 @@ chmod +x 一键更新(update).sh 一键启动(start).sh
 
 `.AppImage` est un format d'application Linux qui ne nécessite pas d'installation et peut être utilisé immédiatement. Convient à la plupart des distributions Linux.
 
-👉 [Linux-AppImage-X86_64](https://github.com/heshengtao/super-agent-party/releases/download/v0.4.2/Super-Agent-Party-0.4.2-Linux-x86_64.AppImage)
+👉 [Linux-AppImage-X86_64](https://github.com/heshengtao/super-agent-party/releases/download/v0.4.3/Super-Agent-Party-0.4.3-Linux-x86_64.AppImage)
 
-👉 [Linux-AppImage-Arm64](https://github.com/heshengtao/super-agent-party/releases/download/v0.4.2/Super-Agent-Party-0.4.2-Linux-arm64.AppImage)
+👉 [Linux-AppImage-Arm64](https://github.com/heshengtao/super-agent-party/releases/download/v0.4.3/Super-Agent-Party-0.4.3-Linux-arm64.AppImage)
 
 ### Déploiement Docker (Cette version de l'animal de bureau n'est visible que via un navigateur)
 
